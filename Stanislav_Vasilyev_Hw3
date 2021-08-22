@@ -10,7 +10,7 @@ select * from product p
 --Компьютерная фирма: При выводе всех значений из таблицы printer дополнительно вывести для тех, у кого цена вышей средней PC - "1", у остальных - "0"
 
 select *,
-case when printer.price > (select avg(price) from printer)
+case when printer.price > (select avg(price) from pc)
 	then 1
 	else 0
 end flag
