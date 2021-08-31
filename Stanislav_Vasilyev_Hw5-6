@@ -1,0 +1,53 @@
+--colab/jupyter: https://colab.research.google.com/drive/1j4XdGIU__NYPVpv74vQa9HUOAkxsgUez?usp=sharing
+
+
+--task5  (lesson6)
+-- Компьютерная фирма: Создать таблицу all_products_with_index_task5 как объединение всех данных по ключу code (union all) и сделать флаг (flag) по цене > максимальной по принтеру. Также добавить нумерацию (через оконные функции) по каждой категории продукта в порядке возрастания цены (price_index). По этому price_index сделать индекс
+
+create table all_products_with_index_task5 as
+select *, row_number () over (order by "type") as price_index,
+case 	when price > (select max(price) from printer p6 )
+		then 1
+		else 0
+		end flag
+from (select p.maker, p.model, p.type, p2.code, p2.price from product p join pc p2 on p.model = p2.model 
+union all 
+select p3.maker, p3.model, p3.type, p4.code, p4.price from product p3 join printer p4 on p3.model = p4.model 
+union all 
+select p5.maker, p5.model, p5.type, l.code, l.price from product p5 join laptop l on p5.model = l.model ) a
+
+--task1  (lesson7)
+-- sqlite3: Сделать тестовый проект с БД (sqlite3, project name: task1_7). В таблицу table1 записать 1000 строк с случайными значениями (3 колонки, тип int) от 0 до 1000.
+-- Далее построить гистаграмму распределения этих трех колонко
+В файле Stanislav_vasilyev_HW6.ipynb на гите.
+--task2  (lesson7)
+-- oracle: https://leetcode.com/problems/duplicate-emails/
+
+select distinct email
+from (select email, count(*) over(partition by email) as c
+from Person)
+where c > 1
+
+--task3  (lesson7)
+-- oracle: https://leetcode.com/problems/employees-earning-more-than-their-managers/
+
+select e1.name  as Employee
+from employee e1
+left join employee e2
+on e1.managerid = e2.id
+where e1.salary > e2.salary
+
+--task4  (lesson7)
+-- oracle: https://leetcode.com/problems/rank-scores/
+
+select score, 
+dense_rank() over(order by score desc) as Rank
+from scores
+
+--task5  (lesson7)
+-- oracle: https://leetcode.com/problems/combine-two-tables/
+
+select FirstName, LastName, City, State
+from person p
+left join address a
+on p.personid = a.personid
