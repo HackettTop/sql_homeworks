@@ -1,0 +1,149 @@
+--task1  (lesson8)
+-- oracle: https://leetcode.com/problems/department-top-three-salaries/
+
+select department, employee, salary
+from (select department.name as Department, employee.name as Employee , employee.salary as Salary ,
+dense_rank() over(partition by department.name order by employee.salary desc) as rank
+from employee 
+join department 
+on employee.DepartmentId  = department.Id) a
+where rank < 4
+
+--task2  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/17
+
+SELECT member_name, status, sum(a.total) as costs
+from (select *,
+extract(year from date) as yyyy,
+unit_price * amount as total
+from FamilyMembers
+join Payments
+on FamilyMembers.member_id = Payments.family_member) as a
+where yyyy = 2005 
+GROUP BY a.status , a.member_name
+
+--task3  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/13
+
+select name
+from (SELECT distinct name, COUNT(*) as cnt 
+from Passenger
+group by name) as a
+where cnt>1
+
+--task4  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/38
+
+select count(*) as COUNT
+from (select * from Student where first_name = "Anna") as a
+
+--task5  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/35
+
+SELECT count(DISTINCT classroom) as count
+from (SELECT *, 
+EXTRACT(day from date) as day,
+extract(month from date) as month,
+extract(year from date) as year
+from Schedule) as a
+where day = 2 and month = 9 and year = 2019 
+
+--task6  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/38
+
+select count(*) as COUNT
+from (select * from Student where first_name = "Anna") as a
+
+--task7  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/32
+
+SELECT round(avg(age1), 0) as age
+from (SELECT *,
+timestampdiff(year, birthday , now()) as age1
+from FamilyMembers) as a
+
+--task8  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/27
+
+SELECT good_type_name, sum(cost) as costs
+from (SELECT *,
+amount * unit_price as cost,
+extract(year from date) as year 
+from Payments
+join Goods
+on Payments.good = Goods.good_id) as a 
+join GoodTypes 
+on a.type = GoodTypes.good_type_id
+where year = 2005
+GROUP BY good_type_name
+
+--task9  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/37
+
+SELECT min(age) as yearw
+from (select *,
+timestampdiff(year, birthday, now()) as age
+from Student) as a
+
+--task10  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/44
+
+SELECT max(age) as max_year
+from (SELECT *, 
+timestampdiff(year, birthday, now()) as age
+from Student) as a
+where a.id in (select student 
+            from Student_in_class 
+            join Class 
+            on Student_in_class.class = Class.id
+            where name like '10%')
+
+--task11 (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/20
+
+SELECT status, member_name, sum(cost) as costs
+from (SELECT *,
+amount * unit_price as cost
+from FamilyMembers
+join Payments
+on FamilyMembers.member_id = Payments.family_member) as a
+where a.good in (SELECT good_id from Goods JOIN GoodTypes on Goods.type = GoodTypes.good_type_id where good_type_name = 'entertainment')
+GROUP BY member_name
+
+--task12  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/55
+
+delete from Company
+where id in (SELECT company
+from (SELECT *,
+dense_rank() over(order BY cnt)  as rnk
+from (SELECT company,
+count(*) as cnt
+from Trip
+GROUP BY company) a) b 
+where rnk = 1)
+
+--task13  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/45
+
+SELECT classroom
+from (SELECT classroom, 
+        COUNT(*) as cnt
+        from Schedule 
+        GROUP BY classroom) as a
+where cnt = (SELECT max(cnt) from (SELECT classroom, COUNT(*) as cnt from Schedule GROUP BY classroom) as b) 
+
+--task14  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/43
+
+SELECT last_name
+from Teacher
+where id in ( SELECT teacher from Schedule join Subject on Schedule.subject = Subject.id where name = 'Physical Culture')
+ORDER BY last_name
+
+--task15  (lesson8)
+-- https://sql-academy.org/ru/trainer/tasks/63
+
+SELECT concat(last_name,'.',left(first_name,1), '.', left(middle_name,1), '.') as name
+from Student
+ORDER BY name
